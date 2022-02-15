@@ -1,0 +1,55 @@
+$black-primary: #1b1b1b;
+$black-secondary: #232323;
+$black-naive: #18181c;
+$grey-naive: #ffffff17;
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+#app {
+  text-align: center;
+  color: #afafaf;
+  background-color: $black-primary;
+  min-height: 100%;
+  width: 100%;
+}
+
+.header {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $black-secondary;
+}
+
+.section {
+  width: 200px;
+  margin-right: 20px;
+}
+
+.player-header {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inner-container {
+  width: 90%;
+}
+
+.n-layout {
+  background-color: $black-naive;
+}
+
+.n-page-header {
+  margin: 20px;
+}
+
+img {
+  border: 1px solid $grey-naive;
+  border-radius: 2px;
+  box-shadow: 0 3px 4px 0 rgb(0 0 0 / 20%), 0 3px 3px -2px rgb(0 0 0 / 14%), 0 1px 8px 0 rgb(0 0 0 / 12%);
+}
