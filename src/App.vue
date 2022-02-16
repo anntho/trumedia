@@ -12,7 +12,13 @@
         </div>
       </div>
 
-      <div v-show="loaded" class="player-header">
+      <div v-show="maxAttempts" class="container">
+        <div class="inner-container">
+          <n-alert title="Error loading data" type="error">Please try again later</n-alert>
+        </div>
+      </div>
+
+      <div v-show="loaded" class="container">
         <div class="inner-container">
           <n-card :style="{ marginBottom: '20px' }">
             <n-layout has-sider>
@@ -81,14 +87,17 @@ export default {
   },
   async mounted() {
     await this.fetchPlayers()
-    this.initialSelect()
   },
   data() {
     return {
       json: json,
+      apiToken: process.env.VUE_APP_API_TOKEN,
       apiKey: process.env.VUE_APP_API_KEY,
+      attempts: 0,
+      maxAttempts: false,
       endpoints: {
         base: 'https://project.trumedianetworks.com',
+        token: '/api/token',
         player: '/api/nfl/player',
         players: '/api/nfl/players',
       },
@@ -234,6 +243,10 @@ export default {
       let endpoint = `${this.endpoints.base}${this.endpoints.players}`
       let players = await this.request(endpoint)
 
+      if (!players) {
+        return
+      }
+
       this.players = players
       this.options = players.map(player => {
         return {
@@ -241,10 +254,33 @@ export default {
           label: player.fullName,
         }
       })
+
+      this.initialSelect()
+    },
+    async token() {
+      let endpoint = `${this.endpoints.base}${this.endpoints.token}`
+      let request = await fetch(endpoint, { headers: { 'apiKey': this.apiKey } })
+      let response = await request.json()
+      this.apiToken = response?.token
     },
     async request(endpoint) {
-      let response = await fetch(endpoint, { headers: { 'TempToken': this.apiKey } })
-      return await response.json()
+      let request = await fetch(endpoint, { headers: { 'TempToken': this.apiToken } })
+      let response = await request.json()
+
+      if (response.statusCode === 401) {
+        if (this.attempts > 1) {
+          this.maxAttempts = true
+          return
+        }
+
+        this.attempts++
+
+        await this.token()
+
+        return await this.request(endpoint)
+      }
+
+      return response
     },
   },
 }
